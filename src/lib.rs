@@ -16,16 +16,29 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn read_file_read_to_string(&self) -> Result<(), Error> {
+    pub fn read_file_read_to_string(&self) -> Result<bool, Error> {
+        let mut b = false;
         for p in self.path.iter() {
             let file_str = fs::read_to_string(p.as_path())?.to_string();
-            println!("{}", file_str);
-        }
-        for query_str in self.query.iter() {
-            println!("{}", query_str);
+
+            for query_str in self.query.iter() {
+                println!("{}", query_str);
+                b = Config::search(query_str, &file_str);
+            }
         }
 
-        Ok(())
+        Ok(b)
+    }
+
+    fn search(query: &str, file_str: &str) -> bool {
+        let b = false;
+        for str in file_str.lines() {
+            if str.contains(query) {
+                return true;
+            }
+            continue;
+        }
+        b
     }
 
     pub fn new() -> Config {
@@ -41,5 +54,16 @@ impl Config {
             s.push_str(&buffer);
         }
         Ok(s)
+    }
+}
+
+mod test {
+    #[test]
+    fn test_search() {
+        let query_str = "test";
+        let file_str = "test\ntest\ntest";
+        let b = super::Config::search(query_str, file_str);
+        println!("{}", b);
+        assert_eq!(b, true);
     }
 }
